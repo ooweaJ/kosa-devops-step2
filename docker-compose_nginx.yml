@@ -15,12 +15,12 @@ services:
       - my_bridge_network
 
   app1:
-    image: jaewoozzang/devops_step2
+    image: jaewoozzang/devops_step2:latest
     networks:
       - my_bridge_network
 
   app2:
-    image: jaewoozzang/devops_step2
+    image: jaewoozzang/devops_step2:latest
     networks:
       - my_bridge_network
 
