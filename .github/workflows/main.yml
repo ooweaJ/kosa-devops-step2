@@ -44,32 +44,43 @@ jobs:
         
     - name: docker image 허브에 저장 
       run: docker push ${{env.DOCKER_USERNAME}}/devops_step2:latest
-        
+       
+    - name: 파일 업로드 
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: docker-compose_nginx.yml
+
   deploy:
     needs: build
     name: Deploy
     runs-on: self-hosted
     steps:
     # copy yml file from src
-    - uses: actions/checkout@v3
-      with:
-        sparse-checkout: |
-          docker-compose_nginx.yml
-          nginx/nginx.conf
-        sparse-checkout-cone-mode: false
-        clean: true
-
-    - name: docker login
-      uses: docker/login-action@v1
-      with:
+    # - uses: actions/checkout@v3
+    #   with:
+    #     sparse-checkout: |
+    #       docker-compose_nginx.yml
+    #       nginx/nginx.conf
+    #     sparse-checkout-cone-mode: false
+    #     clean: true
+      - name: 파일 다운로드
+        uses: actions/download-artifact@v4
+        with:
+        name: my-artifact
+        path: ./docker-compose_nginx.yml
+  
+      - name: docker login
+        uses: docker/login-action@v1
+        with:
         username: ${{env.DOCKER_USERNAME}}
         password: ${{secrets.DOCKER_PASSWORD}}
 
-    - name: docker image pull
-      run: docker pull ${{env.DOCKER_USERNAME}}/devops_step2:latest
+      - name: docker image pull
+        run: docker pull ${{env.DOCKER_USERNAME}}/devops_step2:latest
 
-    - name: docker compose 실행
-      run: docker compose -f docker-compose_nginx.yml up -d 
+      - name: docker compose 실행
+        run: docker compose -f docker-compose_nginx.yml up -d 
 
       
     
